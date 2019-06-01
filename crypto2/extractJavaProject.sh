@@ -30,11 +30,21 @@ do
 		newProject="${PROJECT}_${i}"
 		echo -e "\t creating project: ${newProject}"
 
+
 		# create a new project
 		~/bin/newJavaProject/mkJavaProject.sh ${newProject}
 
 		# copy the contents of this java folder
-		cp -vrp $folder/* /tmp/${newProject}/src
+		cp -rp $folder/* /tmp/${newProject}/src
+
+		# track some stats for later review
+		ORIGIN=/tmp/${newProject}/origination.txt
+		echo -e "Origination folder: $folder" > $ORIGIN
+
+		URL=$(grep url ${PROJECT}/.git/config | cut -d'=' -f2)
+		echo -e "\r\ngit: $URL" >> $ORIGIN
+		echo >> $ORIGIN
+
 	fi
 done
 
