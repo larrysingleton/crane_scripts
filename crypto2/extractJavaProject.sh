@@ -1,6 +1,7 @@
 #!/bin/bash
 
 PROJECT=$(basename $1)
+umask 022
 
 if [ ! -d $PROJECT ]
 then
