@@ -6,8 +6,8 @@
 
 umask 022
 
-which bash
-bash --version
+#which bash
+#bash --version
 echo
 
 PROJECT=$(basename $1)
@@ -63,7 +63,7 @@ mkNewDotProjectFile() {
 
 mkNewJavaProject() {
 	rm -rf /tmp/$PROJECT
-	mkdir -vp /tmp/$PROJECT/bin
+	mkdir -p /tmp/$PROJECT/bin
 
 	> $CLASSPATH_FILE
 	> $PROJECT_FILE
@@ -89,7 +89,7 @@ addSources() {
 		javaCount=$(find $folder -type f -name \*.java | wc -l)
 		if [ $javaCount -eq 0 ]
 		then
-			PRINT "Skipping $folder ($javaCount files)"
+			PRINT "($javaCount) SKIP : $folder"
 			continue;
 		fi
 
@@ -98,8 +98,8 @@ addSources() {
 		SOURCE="src${COUNTER}"
 
 		# track some stats for later review
-		ORIGIN_OUTPUT="$SOURCE : $folder"
-		PRINT $ORIGIN_OUTPUT | tee -a $ORIGIN
+		ORIGIN_OUTPUT="($javaCount) $SOURCE : $folder"
+		PRINT "$ORIGIN_OUTPUT" | tee -a $ORIGIN
 		#echo -e "$SOURCE : $folder" >> $ORIGIN
 
 		# copy the contents of this java folder
@@ -126,7 +126,7 @@ cnt=$(echo $JAVA_FOLDERS | wc -w)
 if [ $cnt -gt 0 ]
 then
 	PRINT "Java paths found: $cnt"
-	displayJavaFolders
+#	displayJavaFolders
 
 	echo -e "Creating project: ${PROJECT}"
 	mkNewJavaProject
