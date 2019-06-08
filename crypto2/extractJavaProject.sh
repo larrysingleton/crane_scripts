@@ -1,13 +1,21 @@
 #!/bin/bash
+# Larry Singleton
+# LarrySingleton@unomaha.edu
+# Version 2.1
+# Date: 06/08/2019
+
 umask 022
+
+which bash
+bash --version
+echo
 
 PROJECT=$(basename $1)
 COUNTER=0
 
-
 if [ ! -d $PROJECT ]
 then
-	echo "$PROJECT not a directory"
+	echo "$PROJECT is not a directory"
 	exit
 fi
 
@@ -15,12 +23,16 @@ CLASSPATH_FILE=/tmp/$PROJECT/.classpath
 PROJECT_FILE=/tmp/$PROJECT/.project
 ORIGIN=/tmp/${PROJECT}/origination.txt
 
+PRINT() {
+	echo -e "$1"
+}
+
 mkNewClasspathFile() {
-	echo -e '<?xml version="1.0" encoding="UTF-8"?>' > $CLASSPATH_FILE
-	echo -e '<classpath>' >> $CLASSPATH_FILE
-	echo -e '\t<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>' >> $CLASSPATH_FILE
-	echo -e '\t<classpathentry kind="output" path="bin"/>' >> $CLASSPATH_FILE
-	echo -e "</classpath>" >> $CLASSPATH_FILE
+	PRINT '<?xml version="1.0" encoding="UTF-8"?>' > $CLASSPATH_FILE
+	PRINT '<classpath>' >> $CLASSPATH_FILE
+	PRINT '\t<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>' >> $CLASSPATH_FILE
+	PRINT '\t<classpathentry kind="output" path="bin"/>' >> $CLASSPATH_FILE
+	PRINT "</classpath>" >> $CLASSPATH_FILE
 }
 
 addSrcClassPath() {
@@ -32,21 +44,21 @@ addSrcClassPath() {
 }
 
 mkNewDotProjectFile() {
-	echo -e "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > $PROJECT_FILE
-	echo -e "<projectDescription>" >> $PROJECT_FILE
-	echo -e "\t<name>$PROJECT</name>" >> $PROJECT_FILE
-	echo -e "\t<comment></comment>" >> $PROJECT_FILE
-	echo -e "\t<projects/>" >> $PROJECT_FILE
-	echo -e "\t<buildSpec>" >> $PROJECT_FILE
-	echo -e "\t\t<buildCommand>" >> $PROJECT_FILE
-	echo -e "\t\t\t<name>org.eclipse.jdt.core.javabuilder</name>" >> $PROJECT_FILE
-	echo -e "\t\t\t<arguments></arguments>" >> $PROJECT_FILE
-	echo -e "\t\t</buildCommand>" >> $PROJECT_FILE
-	echo -e "\t</buildSpec>" >> $PROJECT_FILE
-	echo -e "\t<natures>" >> $PROJECT_FILE
-	echo -e "\t\t<nature>org.eclipse.jdt.core.javanature</nature>" >> $PROJECT_FILE
-	echo -e "\t</natures>" >> $PROJECT_FILE
-	echo -e "</projectDescription>" >> $PROJECT_FILE
+	PRINT "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > $PROJECT_FILE
+	PRINT "<projectDescription>" >> $PROJECT_FILE
+	PRINT "\t<name>$PROJECT</name>" >> $PROJECT_FILE
+	PRINT "\t<comment></comment>" >> $PROJECT_FILE
+	PRINT "\t<projects/>" >> $PROJECT_FILE
+	PRINT "\t<buildSpec>" >> $PROJECT_FILE
+	PRINT "\t\t<buildCommand>" >> $PROJECT_FILE
+	PRINT "\t\t\t<name>org.eclipse.jdt.core.javabuilder</name>" >> $PROJECT_FILE
+	PRINT "\t\t\t<arguments></arguments>" >> $PROJECT_FILE
+	PRINT "\t\t</buildCommand>" >> $PROJECT_FILE
+	PRINT "\t</buildSpec>" >> $PROJECT_FILE
+	PRINT "\t<natures>" >> $PROJECT_FILE
+	PRINT "\t\t<nature>org.eclipse.jdt.core.javanature</nature>" >> $PROJECT_FILE
+	PRINT "\t</natures>" >> $PROJECT_FILE
+	PRINT "</projectDescription>" >> $PROJECT_FILE
 }
 
 mkNewJavaProject() {
@@ -57,14 +69,14 @@ mkNewJavaProject() {
 	> $PROJECT_FILE
 
 	# add .gitgnore file
-	echo "/bin/" > /tmp/$PROJECT/.gitignore
+	PRINT "/bin/" > /tmp/$PROJECT/.gitignore
 
 	# add .project file
 	mkNewDotProjectFile
 
 	# add git url to origination file
 	GITURL=$(grep url ${PROJECT}/.git/config | cut -d'=' -f2)
-	echo -e "git: $GITURL\n" > $ORIGIN
+	PRINT "git: $GITURL\n" > $ORIGIN
 
 	echo
 }
@@ -77,7 +89,7 @@ addSources() {
 		javaCount=$(find $folder -type f -name \*.java | wc -l)
 		if [ $javaCount -eq 0 ]
 		then
-			echo "Skipping $folder ($javaCount files)"
+			PRINT "Skipping $folder ($javaCount files)"
 			continue;
 		fi
 
@@ -87,7 +99,7 @@ addSources() {
 
 		# track some stats for later review
 		ORIGIN_OUTPUT="$SOURCE : $folder"
-		echo $ORIGIN_OUTPUT | tee -a $ORIGIN
+		PRINT $ORIGIN_OUTPUT | tee -a $ORIGIN
 		#echo -e "$SOURCE : $folder" >> $ORIGIN
 
 		# copy the contents of this java folder
@@ -113,7 +125,7 @@ JAVA_FOLDERS=$(find $PROJECT -type d -iname java -not -ipath "*/*test*/*")
 cnt=$(echo $JAVA_FOLDERS | wc -w)
 if [ $cnt -gt 0 ]
 then
-	echo "Java paths found: $cnt"
+	PRINT "Java paths found: $cnt"
 	displayJavaFolders
 
 	echo -e "Creating project: ${PROJECT}"
