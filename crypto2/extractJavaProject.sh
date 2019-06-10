@@ -12,6 +12,7 @@ echo
 
 PROJECT=$(basename $1)
 COUNTER=0
+MKNEWPROJECT=0
 
 if [ ! -d $PROJECT ]
 then
@@ -81,8 +82,20 @@ mkNewJavaProject() {
 	echo
 }
 
+createProject() {
+	echo -e "Creating project: ${PROJECT}"
+	mkNewJavaProject
+	mkNewClasspathFile
+	MKNEWPROJECT=1
+}
 
 addSources() {
+
+	if [ $MKNEWPROJECT -eq 0 ]
+	then
+		createProject
+	fi
+
 	for folder in $JAVA_FOLDERS
 	do
 		# count the number of java files in this folder
@@ -120,6 +133,7 @@ displayJavaFolders() {
 	echo
 }
 
+
 echo "Finding folders that contain java files..."
 JAVA_FOLDERS=$(find $PROJECT -type d -iname java -not -ipath "*/*test*/*")
 cnt=$(echo $JAVA_FOLDERS | wc -w)
@@ -128,9 +142,6 @@ then
 	PRINT "Java paths found: $cnt"
 #	displayJavaFolders
 
-	echo -e "Creating project: ${PROJECT}"
-	mkNewJavaProject
-	mkNewClasspathFile
 	addSources
 fi
 
@@ -157,9 +168,11 @@ do
 	read -p "Continue? " -n 1 -r
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
+		echo
 		continue
 	else
 		break	
 	fi
 done
 
+PRINT "Done."
