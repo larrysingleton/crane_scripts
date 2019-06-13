@@ -12,6 +12,7 @@ echo
 
 PROJECT=$(basename $1)
 COUNTER=0
+JAVA_COUNTER=0
 MKNEWPROJECT=0
 
 if [ ! -d $PROJECT ]
@@ -107,13 +108,15 @@ addSources() {
 		fi
 
 		((++COUNTER))
+		let "JAVA_COUNTER += $javaCount"
 
 		SOURCE="src${COUNTER}"
 
+
 		# track some stats for later review
-		ORIGIN_OUTPUT="($javaCount) $SOURCE : $folder"
+		shortFolder=$(echo $folder | cut -d '/' -f2-)
+		ORIGIN_OUTPUT="($javaCount) $SOURCE : $shortFolder"
 		PRINT "$ORIGIN_OUTPUT" | tee -a $ORIGIN
-		#echo -e "$SOURCE : $folder" >> $ORIGIN
 
 		# copy the contents of this java folder
 		mkdir -p /tmp/$PROJECT/$SOURCE
@@ -129,29 +132,60 @@ displayJavaFolders() {
 	do
 		javaCount=$(find $folder -type f -name \*.java | wc -l)
 		printf "(%03d) $folder\n" $javaCount
+		echo $folder >> /tmp/x
 	done
 	echo
 }
 
+reportFinalResults() {
+	echo; echo;
+	PRINT "Total paths: $COUNTER"
+	PRINT "Total Java files: $JAVA_COUNTER"
+	PRINT "Done."
+	echo; echo;
+}
 
-echo "Finding folders that contain java files..."
+echo "Finding java folders..."
 JAVA_FOLDERS=$(find $PROJECT -type d -iname java -not -ipath "*/*test*/*")
 cnt=$(echo $JAVA_FOLDERS | wc -w)
 if [ $cnt -gt 0 ]
 then
 	PRINT "Java paths found: $cnt"
-#	displayJavaFolders
+	addSources
+fi
+
+echo "Finding source/src folders..."
+FOLDERS=$(find $PROJECT -type f -iname \*.java -not -ipath "*/*java*/*" -not -ipath "*/*test*/*" -exec dirname {} \; | sort -u)
+cnt=$(echo $FOLDERS | wc -w)
+if [ $cnt -gt 0 ]
+then
+	rm -f /tmp/$$
+	PRINT "Java paths found: $cnt"
+
+	NEW_FOLDERS=""
+	for path in $FOLDERS
+	do
+		if [[ $path =~ "src" || $path =~ "source" ]]
+		then
+			echo $path |  sed 's/src\/.*/src/' | sed 's/source\/.*/source/' >> /tmp/$$
+		fi
+	done
+
+	# sort list unique 
+	JAVA_FOLDERS=$(cat /tmp/$$ | sort -u) 
+	cnt=$(echo $JAVA_FOLDERS | wc -w)
+	echo "Reduced paths to: $cnt"
 
 	addSources
 fi
 
-
-echo "Finding folders that contain java files, but not in a java folder..."
-JAVA_FOLDERS=$(find $PROJECT -type f -iname \*.java -not -ipath "*/*java*/*" -not -ipath "*/*test*/*" -exec dirname {} \; | sort -u)
+echo "Finding other source folders..."
+JAVA_FOLDERS=$(find $PROJECT -type f -iname \*.java -not -ipath "*/*java*/*" -not -ipath "*/*test*/*" -not -ipath "*/*source*/*" -not -ipath "*/*src*/*" -exec dirname {} \; | sort -u)
 cnt=$(echo $JAVA_FOLDERS | wc -w)
 echo "Java paths found: $cnt"
 if [ $cnt -eq 0 ]
 then
+	reportFinalResults
 	exit
 fi
 
@@ -159,20 +193,18 @@ displayJavaFolders
 
 while true
 do
-	# prompt user to add source from path
-	read -p "Enter path: " -r
-	echo
-	JAVA_FOLDERS=$REPLY
-	addSources
-
 	read -p "Continue? " -n 1 -r
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
 		echo
-		continue
+		# prompt user to add source from path
+		read -p "Enter path: " -r
+		echo
+		JAVA_FOLDERS=$REPLY
+		addSources
 	else
 		break	
 	fi
 done
 
-PRINT "Done."
+reportFinalResults
