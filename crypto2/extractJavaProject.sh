@@ -141,6 +141,7 @@ reportFinalResults() {
 	echo; echo;
 	PRINT "Total paths: $COUNTER"
 	PRINT "Total Java files: $JAVA_COUNTER"
+	PRINT "Location: /tmp/${PROJECT}"
 	PRINT "Done."
 	echo; echo;
 }
