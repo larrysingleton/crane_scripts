@@ -158,7 +158,12 @@ reportFinalResults() {
 	echo; echo;
 }
 
-echo "Finding java folders..."
+#########################
+# Start of script
+#########################
+PRINT "Project: $PROJECT"
+
+PRINT "Finding java folders..."
 JAVA_FOLDERS=$(find $PROJECT -type d -iname java -not -ipath "*/*test*/*")
 cnt=$(echo $JAVA_FOLDERS | wc -w)
 if [ $cnt -gt 0 ]
@@ -167,12 +172,12 @@ then
 	addSources
 fi
 
-echo "Finding source/src folders..."
+PRINT "Finding source/src folders..."
 FOLDERS=$(find $PROJECT -type f -iname \*.java -not -ipath "*/*java*/*" -not -ipath "*/*test*/*" -exec dirname {} \; | sort -u)
 cnt=$(echo $FOLDERS | wc -w)
 if [ $cnt -gt 0 ]
 then
-	rm -f /tmp/$$
+	rm -f /tmp/$$ 2> /dev/null
 	PRINT "Java paths found: $cnt"
 
 	NEW_FOLDERS=""
@@ -188,11 +193,12 @@ then
 	JAVA_FOLDERS=$(cat /tmp/$$ | sort -u) 
 	cnt=$(echo $JAVA_FOLDERS | wc -w)
 	echo "Reduced paths to: $cnt"
+	rm -f /tmp/$$ 2> /dev/null
 
 	addSources
 fi
 
-echo "Finding other source folders..."
+PRINT "Finding other source folders..."
 JAVA_FOLDERS=$(find $PROJECT -type f -iname \*.java -not -ipath "*/*java*/*" -not -ipath "*/*test*/*" -not -ipath "*/*source*/*" -not -ipath "*/*src*/*" -exec dirname {} \; | sort -u)
 cnt=$(echo $JAVA_FOLDERS | wc -w)
 if [ $cnt -gt 0 ]
