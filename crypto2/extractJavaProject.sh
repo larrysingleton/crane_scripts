@@ -65,10 +65,10 @@ mkNewDotProjectFile() {
 
 cpReadmeFile() {
 	# determnine if a readme.md file exists
-	README=$(find $PROJECT -maxdepth 1 -type f -iname readme.md)
-	if [ -f $README ]
+	README=$(find $PROJECT -maxdepth 1 -type f -iname readme*)
+	if [ -f "$README" ]
 	then
-		cp $README /tmp/$PROJECT/readme.md	
+		cp $README /tmp/$PROJECT/README.md	
 	fi
 }
 
