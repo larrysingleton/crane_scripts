@@ -63,6 +63,15 @@ mkNewDotProjectFile() {
 	PRINT "</projectDescription>" >> $PROJECT_FILE
 }
 
+cpReadmeFile() {
+	# determnine if a readme.md file exists
+	README=$(find $PROJECT -maxdepth 1 -type f -iname readme.md)
+	if [ -f $README ]
+	then
+		cp $README /tmp/$PROJECT/readme.md	
+	fi
+}
+
 mkNewJavaProject() {
 	rm -rf /tmp/$PROJECT
 	mkdir -p /tmp/$PROJECT/bin
@@ -75,6 +84,9 @@ mkNewJavaProject() {
 
 	# add .project file
 	mkNewDotProjectFile
+
+	# add readme.md if it exists
+	cpReadmeFile
 
 	# add git url to origination file
 	GITURL=$(grep url ${PROJECT}/.git/config | cut -d'=' -f2)
@@ -138,9 +150,9 @@ displayJavaFolders() {
 }
 
 reportFinalResults() {
-	echo; echo;
-	PRINT "Total paths: $COUNTER"
-	PRINT "Total Java files: $JAVA_COUNTER"
+#	PRINT "\n" | tee -a $ORIGIN
+	PRINT "Total paths: $COUNTER" | tee -a $ORIGIN
+	PRINT "Total Java files: $JAVA_COUNTER" | tee -a $ORIGIN
 	PRINT "Location: /tmp/${PROJECT}"
 	PRINT "Done."
 	echo; echo;
@@ -183,7 +195,16 @@ fi
 echo "Finding other source folders..."
 JAVA_FOLDERS=$(find $PROJECT -type f -iname \*.java -not -ipath "*/*java*/*" -not -ipath "*/*test*/*" -not -ipath "*/*source*/*" -not -ipath "*/*src*/*" -exec dirname {} \; | sort -u)
 cnt=$(echo $JAVA_FOLDERS | wc -w)
-echo "Java paths found: $cnt"
+if [ $cnt -gt 0 ]
+then
+	PRINT "Java paths found: $cnt"
+	addSources
+fi
+
+reportFinalResults
+exit
+###################################################################################
+
 if [ $cnt -eq 0 ]
 then
 	reportFinalResults
