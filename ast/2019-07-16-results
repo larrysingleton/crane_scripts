@@ -1,0 +1,4 @@
+Missing argument for option: i
+usage: ASTSimpleVisitorCounter
+ -d,--debug         debug flag
+ -i,--input <arg>   javaProjectRootPath
