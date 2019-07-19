@@ -9,7 +9,7 @@ then
 	exit
 fi
 
-for folder in `find . -maxdepth 1 -type d | grep -v ^[.]$ | sort`
+for folder in `find . -mindepth 1 -maxdepth 1 -type d | sort`
 do
 	BASE=$(basename $folder)
 	SEQ=$(printf "%03d" $INPUT)	

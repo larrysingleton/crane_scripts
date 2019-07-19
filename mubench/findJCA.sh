@@ -2,11 +2,11 @@
 
 > jcaCounts
 
-for project in `find . -maxdepth 1 -type d | grep -v ^[.]$`
+list=$(find . -mindepth 1 -maxdepth 1 -type d | sort)
+for project in $list
 do
-	echo -e "\nSearching: $project ..."
-	cnt=$(find $project -type f -name \*.java -exec grep javax.crypto {} \; -print | wc -l)
-	echo -e "\t$cnt"
-
-	echo "$cnt $project" >> jcaCounts
+	JAVA=$(find $project -type f -name \*.java)
+	jca=$(grep javax.crypto $JAVA | wc -l)
+	sks=$(grep "new SecretKeySpec" $JAVA | wc -l)
+	echo "$(basename $project) $jca $sks"  | tee -a jcaCounts
 done
