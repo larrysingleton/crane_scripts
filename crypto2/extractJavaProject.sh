@@ -90,7 +90,7 @@ mkNewJavaProject() {
 
 	# add git url to origination file
 	GITURL=$(grep url ${PROJECT}/.git/config | cut -d'=' -f2)
-	PRINT "git: $GITURL\n" > $ORIGIN
+	PRINT "git clone $GITURL $PROJECT\n" > $ORIGIN
 
 	echo
 }
