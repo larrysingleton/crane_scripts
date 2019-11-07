@@ -17,6 +17,7 @@ do
 	ID=$(echo $BPRJ | cut -d'_' -f1)
 	PRJ=$(echo $BPRJ | cut -d'_' -f2-)
 	GRP=$(grep "^${PRJ}$(printf '\t')" $GRPS | awk '{print $2}')
+	echo $GRP > ${project}/group
 
 	# list of java files
 	JAVA=$(find $project -type f -name \*.java)
@@ -28,19 +29,29 @@ do
 	imports=$(grep "import javax.crypto" $JAVA | wc -l)
 
 	# JCA1 : MessageDigest.getInstance
-	jca1=$(grep "MessageDigest.getInstance" $JAVA | wc -l)
+	jca1list=${project}/jca1.list
+	grep "Cipher.getInstance" $JAVA > $jca1list
+	jca1=$(cat $jca1list | wc -l)
 
 	# JCA2 : Cipher.getInstance
-	jca2=$(grep "Cipher.getInstance" $JAVA | wc -l)
+	jca2list=${project}/jca2.list
+	grep "MessageDigest.getInstance" $JAVA > $jca2list
+	jca2=$(cat $jca2list | wc -l)
 
 	# JCA3: SecretKeySpec
-	jca3=$(grep "new SecretKeySpec" $JAVA | wc -l)
+	jca3list=${project}/jca3.list
+	grep "new SecretKeySpec" $JAVA > $jca3list
+	jca3=$(cat $jca3list | wc -l)
 
 	# JCA4: PBEParameterSpec
-	jca4=$(grep "new PBEParameterSpec" $JAVA | wc -l)
+	jca4list=${project}/jca4.list
+	grep "new PBEParameterSpec" $JAVA > $jca4list
+	jca4=$(cat $jca4list | wc -l)
 
 	# JCA5: SecureRandom.getInstance
-	jca5=$(grep "SecureRandom.getInstance" $JAVA | wc -l)
+	jca5list=${project}/jca5.list
+	grep "SecureRandom.getInstance" $JAVA > $jca5list
+	jca5=$(cat $jca5list | wc -l)
 	
 	echo "| $ID | $PRJ | $GRP | $classes | $imports | $jca1 | $jca2 | $jca3 | $jca4 | $jca5 |"  | tee -a $OUT
 done
