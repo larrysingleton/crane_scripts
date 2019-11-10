@@ -53,7 +53,7 @@ do
 	> $jca5list
 
 	cnts=$(grep -c "SecureRandom.getInstance" $JAVA | grep -v :0)
-	if [ "$cnt" != "" ]
+	if [ "$cnts" != "" ]
 	then
 		for file in `echo $cnts | cut -d':' -f1`
 		do
