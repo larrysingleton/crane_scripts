@@ -50,8 +50,19 @@ do
 
 	# JCA5: SecureRandom.getInstance
 	jca5list=${project}/jca5.list
-	grep "SecureRandom.getInstance" $JAVA > $jca5list
-	jca5=$(cat $jca5list | wc -l)
+	> $jca5list
+
+	cnts=$(grep -c "SecureRandom.getInstance" $JAVA | grep -v :0)
+	if [ "$cnt" != "" ]
+	then
+		for file in `echo $cnts | cut -d':' -f1`
+		do
+			echo $file >> $jca5list
+			grep "SecureRandom.getInstance" $file >> $jca5list
+			grep "setSeed" $file >> $jca5list
+		done	
+	fi
+	jca5=$(cat $jca5list | grep -v $project | wc -l)
 	
 	echo "| $ID | $PRJ | $GRP | $classes | $imports | $jca1 | $jca2 | $jca3 | $jca4 | $jca5 |"  | tee -a $OUT
 done
